@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, BookOpen, PenTool, MessageSquare, Edit3, Sparkles } from 'lucide-react';
+import { ArrowLeft, BookOpen, PenTool, MessageSquare, Edit3, Sparkles, Scroll, Shield } from 'lucide-react';
 import type { ActivityType } from '@/types';
+import { useGameState } from '@/hooks/useGameState';
 
 interface EnglishLandProps {
   onSelectActivity: (activity: ActivityType) => void;
@@ -10,156 +11,163 @@ interface EnglishLandProps {
 const englishActivities = [
   {
     id: 'english-spelling' as ActivityType,
-    title: 'Spelling Springs',
-    description: 'Master words with Look-Say-Cover-Write-Check!',
+    title: 'Arcane Runes',
+    description: 'Master the ancient runes of spelling through mystical incantations!',
     icon: Sparkles,
-    emoji: '🌊',
-    color: 'from-blue-400 to-cyan-400',
-    bgColor: 'bg-blue-50',
+    emoji: '✨',
+    gradient: 'from-cyan-500 to-blue-500',
     difficulty: 'All Levels'
   },
   {
     id: 'english-grammar' as ActivityType,
-    title: 'Grammar Grove',
-    description: 'Learn nouns, verbs, adjectives and more!',
+    title: 'Grammar Grimoire',
+    description: 'Unlock the secrets of nouns, verbs, and magical sentence structure!',
     icon: MessageSquare,
-    emoji: '🌳',
-    color: 'from-green-400 to-emerald-400',
-    bgColor: 'bg-green-50',
+    emoji: '📜',
+    gradient: 'from-purple-500 to-indigo-500',
     difficulty: 'Parts of Speech'
   },
   {
     id: 'english-punctuation' as ActivityType,
-    title: 'Punctuation Pond',
-    description: 'Master full stops, commas, and apostrophes!',
+    title: 'Punctuation Sigils',
+    description: 'Channel the power of commas, periods, and apostrophes!',
     icon: Edit3,
-    emoji: '🦆',
-    color: 'from-yellow-400 to-orange-400',
-    bgColor: 'bg-yellow-50',
+    emoji: '⚡',
+    gradient: 'from-yellow-500 to-amber-500',
     difficulty: 'All Marks'
   },
   {
     id: 'english-writing' as ActivityType,
-    title: 'Writing Workshop',
-    description: 'Create amazing stories and persuasive pieces!',
+    title: 'Scribe\'s Sanctum',
+    description: 'Weave powerful tales and persuasive enchantments!',
     icon: PenTool,
-    emoji: '✍️',
-    color: 'from-purple-400 to-violet-400',
-    bgColor: 'bg-purple-50',
+    emoji: '🖋️',
+    gradient: 'from-emerald-500 to-green-500',
     difficulty: 'Creative Writing'
   },
   {
     id: 'english-reading' as ActivityType,
-    title: 'Reading River',
-    description: 'Read stories and answer comprehension questions!',
+    title: 'Tome of Legends',
+    description: 'Decode ancient texts and unlock their hidden meanings!',
     icon: BookOpen,
-    emoji: '📚',
-    color: 'from-pink-400 to-rose-400',
-    bgColor: 'bg-pink-50',
+    emoji: '📖',
+    gradient: 'from-rose-500 to-pink-500',
     difficulty: 'Comprehension'
   }
 ];
 
 export function EnglishLand({ onSelectActivity, onBack }: EnglishLandProps) {
+  const { state } = useGameState();
+  const { player } = state;
+
   return (
-    <div 
-      className="min-h-screen p-4 md:p-6"
+    <div className="min-h-screen p-4 md:p-6"
       style={{
-        backgroundImage: 'url(/images/word-forest.png)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
+        background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
       }}
     >
-      {/* Header */}
-      <header className="max-w-6xl mx-auto mb-6">
-        <div className="flex items-center gap-4">
-          <motion.button
-            onClick={onBack}
-            className="p-3 rounded-full bg-white/90 shadow-md hover:shadow-lg transition-shadow backdrop-blur-sm"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <ArrowLeft className="w-6 h-6 text-charcoal" />
-          </motion.button>
-          
-          <div className="flex-1">
-            <h1 className="text-3xl md:text-4xl font-bold text-charcoal flex items-center gap-3 drop-shadow-lg">
-              <span className="text-4xl">🌲</span>
-              Word Forest
-            </h1>
-            <p className="text-charcoal font-medium drop-shadow-md">
-              Where words come alive and stories begin!
-            </p>
-          </div>
-        </div>
-      </header>
-
-      {/* Welcome Message with Wordy Fox */}
-      <div className="max-w-6xl mx-auto mb-8">
-        <div className="watercolour-card p-6 flex items-center gap-6">
-          <img 
-            src="/images/wordy-fox.png" 
-            alt="Wordy the Fox" 
-            className="w-24 h-24 rounded-full object-cover shadow-lg"
-          />
-          <div>
-            <h2 className="text-xl font-bold text-charcoal mb-1">
-              Hello, word explorer!
-            </h2>
-            <p className="text-warm-gray">
-              I'm Wordy the Fox. Let's explore the magic of words together!
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Activity Grid */}
       <div className="max-w-6xl mx-auto">
-        <h3 className="text-lg font-bold text-charcoal mb-4">Choose Your Adventure</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {englishActivities.map((activity, index) => (
+        {/* Header */}
+        <motion.header
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="mb-8"
+        >
+          <div className="flex items-center gap-4 mb-6">
             <motion.button
-              key={activity.id}
-              onClick={() => onSelectActivity(activity.id)}
-              className={`${activity.bgColor} rounded-2xl p-5 text-left border-2 border-transparent hover:border-white/50 transition-all shadow-md hover:shadow-lg`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.02, y: -4 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onBack}
+              className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white transition-colors"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${activity.color} flex items-center justify-center text-2xl shadow-md`}>
-                  {activity.emoji}
-                </div>
-                <activity.icon className="w-5 h-5 text-charcoal/50" />
-              </div>
-              
-              <h4 className="text-lg font-bold text-charcoal mb-2">{activity.title}</h4>
-              <p className="text-sm text-warm-gray mb-3">{activity.description}</p>
-              
-              <div className="flex items-center justify-between">
-                <span className="text-xs px-2 py-1 rounded-full bg-white/60 text-charcoal/70">
-                  {activity.difficulty}
-                </span>
-                <span className="text-sage-green text-sm font-medium">Start →</span>
-              </div>
+              <ArrowLeft className="w-5 h-5" />
+              Back to Academy
             </motion.button>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      {/* Quote of the Day */}
-      <div className="max-w-6xl mx-auto mt-8">
-        <div className="watercolour-card p-4 text-center">
-          <p className="text-warm-gray text-sm italic">
-            "The more that you read, the more things you will know. 
-            The more that you learn, the more places you'll go." 
-            <span className="font-bold text-sage-green"> — Dr. Seuss</span>
-          </p>
-        </div>
+          <div className="text-center">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: 'spring' }}
+              className="inline-flex items-center justify-center w-20 h-20 mb-4 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl"
+            >
+              <Scroll className="w-10 h-10 text-white" />
+            </motion.div>
+
+            <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+              English Kingdom
+            </h1>
+            
+            <p className="text-blue-200 text-lg max-w-2xl mx-auto">
+              Greetings, {player.name}! Master the linguistic arts to command the power of words.
+            </p>
+          </div>
+        </motion.header>
+
+        {/* Activities Grid */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        >
+          {englishActivities.map((activity, index) => (
+            <ActivityCard
+              key={activity.id}
+              activity={activity}
+              onClick={() => onSelectActivity(activity.id)}
+              index={index}
+            />
+          ))}
+        </motion.div>
       </div>
     </div>
+  );
+}
+
+interface ActivityCardProps {
+  activity: typeof englishActivities[0];
+  onClick: () => void;
+  index: number;
+}
+
+function ActivityCard({ activity, onClick, index }: ActivityCardProps) {
+  const Icon = activity.icon;
+
+  return (
+    <motion.button
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1 * index }}
+      whileHover={{ scale: 1.02, y: -5 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={onClick}
+      className="w-full p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-left group"
+    >
+      <div className="flex items-start gap-4">
+        <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${activity.gradient} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
+          <Icon className="w-7 h-7 text-white" />
+        </div>
+
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-2xl">{activity.emoji}</span>
+            <h3 className="text-lg font-bold text-white" style={{ fontFamily: 'Georgia, serif' }}>
+              {activity.title}
+            </h3>
+          </div>
+          
+          <p className="text-white/60 text-sm mb-2">
+            {activity.description}
+          </p>
+          
+          <div className="flex items-center gap-2">
+            <Shield className="w-3 h-3 text-white/40" />
+            <span className="text-xs text-white/40">{activity.difficulty}</span>
+          </div>
+        </div>
+      </div>
+    </motion.button>
   );
 }

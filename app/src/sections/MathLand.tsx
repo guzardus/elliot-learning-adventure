@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, Plus, Minus, X, Divide, Brain, Ruler, Shapes, BarChart3, DollarSign, PieChart, Binary } from 'lucide-react';
+import { ArrowLeft, Plus, Minus, X, Divide, Brain, Ruler, Shapes, BarChart3, DollarSign, PieChart, Binary, Sword, Shield, Castle } from 'lucide-react';
 import type { ActivityType } from '@/types';
+import { useGameState } from '@/hooks/useGameState';
 
 interface MathLandProps {
   onSelectActivity: (activity: ActivityType) => void;
@@ -10,215 +11,226 @@ interface MathLandProps {
 const mathActivities = [
   {
     id: 'math-addition' as ActivityType,
-    title: 'Treasure Hoard',
-    description: 'Add up gold coins and treasures!',
+    title: 'Forge of Numbers',
+    description: 'Combine mystical energies through addition!',
     icon: Plus,
-    emoji: '💰',
-    color: 'from-yellow-400 to-orange-400',
-    bgColor: 'bg-yellow-50',
+    emoji: '🔥',
+    gradient: 'from-red-500 to-orange-500',
     difficulty: 'Easy to Hard'
   },
   {
     id: 'math-subtraction' as ActivityType,
-    title: 'Bridge Repair',
-    description: 'Fix broken bridges by finding the difference!',
+    title: 'Shadow Subtraction',
+    description: 'Remove dark forces to reveal the truth!',
     icon: Minus,
-    emoji: '🌉',
-    color: 'from-blue-400 to-cyan-400',
-    bgColor: 'bg-blue-50',
+    emoji: '🌑',
+    gradient: 'from-purple-500 to-indigo-500',
     difficulty: 'Easy to Hard'
   },
   {
     id: 'math-multiplication' as ActivityType,
-    title: 'Garden Growth',
-    description: 'Plant seeds that multiply into flower patches!',
+    title: 'Crystal Multiplication',
+    description: 'Multiply magical crystals to power your spells!',
     icon: X,
-    emoji: '🌸',
-    color: 'from-pink-400 to-rose-400',
-    bgColor: 'bg-pink-50',
+    emoji: '💎',
+    gradient: 'from-cyan-500 to-blue-500',
     difficulty: 'Times Tables to 2-digit'
   },
   {
     id: 'math-division' as ActivityType,
-    title: 'Sharing Feast',
-    description: 'Share food equally among animal friends!',
+    title: 'Ancient Division',
+    description: 'Split legendary treasures among your allies!',
     icon: Divide,
-    emoji: '🍰',
-    color: 'from-green-400 to-emerald-400',
-    bgColor: 'bg-green-50',
+    emoji: '⚔️',
+    gradient: 'from-amber-500 to-yellow-500',
     difficulty: 'With Remainders'
   },
   {
     id: 'math-wordProblems' as ActivityType,
-    title: 'Word Problem Woods',
-    description: 'Solve fun story puzzles and adventures!',
+    title: 'Riddle Realm',
+    description: 'Solve mystical riddles and puzzles!',
     icon: Brain,
-    emoji: '🌲',
-    color: 'from-purple-400 to-violet-400',
-    bgColor: 'bg-purple-50',
+    emoji: '📜',
+    gradient: 'from-emerald-500 to-green-500',
     difficulty: 'All Operations'
   },
   {
     id: 'math-measurement' as ActivityType,
-    title: 'Measurement Mountain',
-    description: 'Time, money, length, and more!',
+    title: 'Dimensional Gates',
+    description: 'Master time, space, and magical distances!',
     icon: Ruler,
-    emoji: '⏰',
-    color: 'from-orange-400 to-amber-400',
-    bgColor: 'bg-orange-50',
+    emoji: '🌀',
+    gradient: 'from-violet-500 to-purple-500',
     difficulty: 'Real-world Math'
   },
   {
     id: 'math-geometry' as ActivityType,
-    title: 'Shape Valley',
-    description: 'Explore shapes, symmetry, and space!',
+    title: 'Sacred Geometry',
+    description: 'Unlock the secrets of ancient shapes!',
     icon: Shapes,
-    emoji: '🔷',
-    color: 'from-teal-400 to-cyan-400',
-    bgColor: 'bg-teal-50',
+    emoji: '🔮',
+    gradient: 'from-pink-500 to-rose-500',
     difficulty: '2D & 3D Shapes'
   },
   {
     id: 'math-data' as ActivityType,
-    title: 'Data Detective',
-    description: 'Read graphs, charts, and solve data puzzles!',
+    title: 'Oracle\'s Charts',
+    description: 'Read the signs in magical data!',
     icon: BarChart3,
-    emoji: '📊',
-    color: 'from-indigo-400 to-purple-400',
-    bgColor: 'bg-indigo-50',
-    difficulty: 'Graphs & Charts'
+    emoji: '🌟',
+    gradient: 'from-teal-500 to-cyan-500',
+    difficulty: 'Graphs & Tables'
   },
   {
     id: 'math-money' as ActivityType,
-    title: 'Money Market',
-    description: 'Calculate change and manage your coins!',
+    title: 'Dragon\'s Hoard',
+    description: 'Count the gold of ancient dragons!',
     icon: DollarSign,
-    emoji: '💵',
-    color: 'from-green-500 to-emerald-500',
-    bgColor: 'bg-green-50',
-    difficulty: 'Australian Currency'
+    emoji: '🐉',
+    gradient: 'from-yellow-500 to-amber-500',
+    difficulty: 'Money Math'
   },
   {
     id: 'math-fractions' as ActivityType,
-    title: 'Fraction Forest',
-    description: 'Share, divide, and compare parts!',
+    title: 'Alchemist\'s Portions',
+    description: 'Mix magical potions with precise fractions!',
     icon: PieChart,
-    emoji: '🍕',
-    color: 'from-red-400 to-pink-400',
-    bgColor: 'bg-red-50',
+    emoji: '⚗️',
+    gradient: 'from-green-500 to-emerald-500',
     difficulty: 'Parts & Wholes'
   },
   {
     id: 'math-patterns' as ActivityType,
-    title: 'Pattern Paradise',
-    description: 'Find rules and continue sequences!',
+    title: 'Mystic Patterns',
+    description: 'Discover the sequences of magic!',
     icon: Binary,
-    emoji: '🔢',
-    color: 'from-violet-400 to-purple-400',
-    bgColor: 'bg-violet-50',
-    difficulty: 'Skip Counting & Rules'
+    emoji: '✨',
+    gradient: 'from-indigo-500 to-blue-500',
+    difficulty: 'Number Patterns'
+  },
+  {
+    id: 'surprise-mix' as ActivityType,
+    title: 'Chaos Challenge',
+    description: 'Face random trials of mathematical might!',
+    icon: Sword,
+    emoji: '🎲',
+    gradient: 'from-red-600 to-purple-600',
+    difficulty: 'Mixed Operations'
   }
 ];
 
 export function MathLand({ onSelectActivity, onBack }: MathLandProps) {
+  const { state } = useGameState();
+  const { player } = state;
+
   return (
-    <div 
-      className="min-h-screen p-4 md:p-6"
+    <div className="min-h-screen p-4 md:p-6"
       style={{
-        backgroundImage: 'url(/images/treasure-hoard.png)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
+        background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
       }}
     >
-      {/* Header */}
-      <header className="max-w-6xl mx-auto mb-6">
-        <div className="flex items-center gap-4">
-          <motion.button
-            onClick={onBack}
-            className="p-3 rounded-full bg-white/90 shadow-md hover:shadow-lg transition-shadow backdrop-blur-sm"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <ArrowLeft className="w-6 h-6 text-charcoal" />
-          </motion.button>
-          
-          <div className="flex-1">
-            <h1 className="text-3xl md:text-4xl font-bold text-charcoal flex items-center gap-3 drop-shadow-lg">
-              <span className="text-4xl">🏰</span>
-              Number Kingdom
-            </h1>
-            <p className="text-charcoal font-medium drop-shadow-md">
-              Where math becomes a magical adventure!
-            </p>
-          </div>
-        </div>
-      </header>
-
-      {/* Welcome Message with Professor Owl */}
-      <div className="max-w-6xl mx-auto mb-8">
-        <div className="watercolour-card p-6 flex items-center gap-6">
-          <img 
-            src="/images/professor-owl.png" 
-            alt="Professor Paws" 
-            className="w-24 h-24 rounded-full object-cover shadow-lg"
-          />
-          <div>
-            <h2 className="text-xl font-bold text-charcoal mb-1">
-              Greetings, young mathematician!
-            </h2>
-            <p className="text-warm-gray">
-              I'm Professor Paws. Choose a quest to begin your math adventure!
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Activity Grid */}
       <div className="max-w-6xl mx-auto">
-        <h3 className="text-lg font-bold text-charcoal mb-4">Choose Your Quest</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {mathActivities.map((activity, index) => (
+        {/* Header */}
+        <motion.header
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="mb-8"
+        >
+          <div className="flex items-center gap-4 mb-6">
             <motion.button
-              key={activity.id}
-              onClick={() => onSelectActivity(activity.id)}
-              className={`${activity.bgColor} rounded-2xl p-5 text-left border-2 border-transparent hover:border-white/50 transition-all shadow-md hover:shadow-lg`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.02, y: -4 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onBack}
+              className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white transition-colors"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${activity.color} flex items-center justify-center text-2xl shadow-md`}>
-                  {activity.emoji}
-                </div>
-                <activity.icon className="w-5 h-5 text-charcoal/50" />
-              </div>
-              
-              <h4 className="text-lg font-bold text-charcoal mb-2">{activity.title}</h4>
-              <p className="text-sm text-warm-gray mb-3">{activity.description}</p>
-              
-              <div className="flex items-center justify-between">
-                <span className="text-xs px-2 py-1 rounded-full bg-white/60 text-charcoal/70">
-                  {activity.difficulty}
-                </span>
-                <span className="text-soft-coral text-sm font-medium">Start →</span>
-              </div>
+              <ArrowLeft className="w-5 h-5" />
+              Back to Academy
             </motion.button>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      {/* Fun Fact */}
-      <div className="max-w-6xl mx-auto mt-8">
-        <div className="watercolour-card p-4 text-center">
-          <p className="text-warm-gray text-sm">
-            <span className="font-bold text-soft-coral">Did you know?</span>{' '}
-            The ancient Egyptians used math to build the pyramids over 4,500 years ago! 🏛️
-          </p>
-        </div>
+          <div className="text-center">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: 'spring' }}
+              className="inline-flex items-center justify-center w-20 h-20 mb-4 bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl"
+            >
+              <Castle className="w-10 h-10 text-white" />
+            </motion.div>
+
+            <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+              Math Realm
+            </h1>
+            
+            <p className="text-blue-200 text-lg max-w-2xl mx-auto">
+              Welcome, {player.name}! Master the arcane arts of mathematics to strengthen your companions.
+            </p>
+          </div>
+        </motion.header>
+
+        {/* Activities Grid */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        >
+          {mathActivities.map((activity, index) => (
+            <ActivityCard
+              key={activity.id}
+              activity={activity}
+              onClick={() => onSelectActivity(activity.id)}
+              index={index}
+            />
+          ))}
+        </motion.div>
       </div>
     </div>
+  );
+}
+
+interface ActivityCardProps {
+  activity: typeof mathActivities[0];
+  onClick: () => void;
+  index: number;
+}
+
+function ActivityCard({ activity, onClick, index }: ActivityCardProps) {
+  const Icon = activity.icon;
+
+  return (
+    <motion.button
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1 * index }}
+      whileHover={{ scale: 1.02, y: -5 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={onClick}
+      className="w-full p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-left group"
+    >
+      <div className="flex items-start gap-4">
+        <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${activity.gradient} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
+          <Icon className="w-7 h-7 text-white" />
+        </div>
+
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-2xl">{activity.emoji}</span>
+            <h3 className="text-lg font-bold text-white" style={{ fontFamily: 'Georgia, serif' }}>
+              {activity.title}
+            </h3>
+          </div>
+          
+          <p className="text-white/60 text-sm mb-2">
+            {activity.description}
+          </p>
+          
+          <div className="flex items-center gap-2">
+            <Shield className="w-3 h-3 text-white/40" />
+            <span className="text-xs text-white/40">{activity.difficulty}</span>
+          </div>
+        </div>
+      </div>
+    </motion.button>
   );
 }
