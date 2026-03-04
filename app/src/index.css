@@ -1,0 +1,219 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* MYTHIC ACADEMY - Dark Fantasy Theme */
+:root {
+  /* Dark Fantasy Palette */
+  --mythic-dark: #1a1a2e;
+  --mythic-navy: #16213e;
+  --mythic-blue: #0f3460;
+  --mythic-purple: #533483;
+  --mythic-gold: #e94560;
+  --mythic-accent: #e94560;
+  
+  /* Legacy watercolour colors (kept for compatibility) */
+  --cream: #FDF8F3;
+  --soft-coral: #F4A698;
+  --sage-green: #8FB996;
+  --sky-blue: #A8D5E5;
+  --warm-yellow: #F9E076;
+  --charcoal: #3D3D3D;
+  --warm-gray: #7A7A7A;
+  --soft-pink: #F5D5CB;
+  --lavender: #D4C5E8;
+  --peach: #FAD4B5;
+  
+  --radius: 1rem;
+  --background: 240 33% 10%;
+  --foreground: 0 0% 98%;
+  --card: 240 33% 12%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 33% 10%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 346 84% 56%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 50% 30%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 240 20% 20%;
+  --muted-foreground: 240 10% 60%;
+  --accent: 280 50% 40%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 240 20% 20%;
+  --input: 240 20% 20%;
+  --ring: 346 84% 56%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply antialiased;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: #ffffff;
+    font-family: 'Nunito', 'Open Sans', system-ui, sans-serif;
+    min-height: 100vh;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Georgia', 'Quicksand', serif;
+    font-weight: 700;
+  }
+}
+
+/* Custom animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+@keyframes bounce-gentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100%) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-sparkle {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.animate-bounce-gentle {
+  animation: bounce-gentle 2s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out;
+}
+
+/* Watercolour card effect */
+.watercolour-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(253,248,243,0.95) 100%);
+  border: 2px solid rgba(255,255,255,0.5);
+  background-clip: padding-box;
+  box-shadow: 
+    0 4px 20px rgba(141, 185, 150, 0.2),
+    0 2px 8px rgba(244, 166, 152, 0.15),
+    inset 0 1px 0 rgba(255,255,255,0.9);
+  border-radius: 1.5rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.watercolour-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 8px 30px rgba(141, 185, 150, 0.25),
+    0 4px 12px rgba(244, 166, 152, 0.2),
+    inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+/* Gradient backgrounds */
+.bg-gradient-math {
+  background: linear-gradient(135deg, #FDF8F3 0%, #F5D5CB 50%, #FAD4B5 100%);
+}
+
+.bg-gradient-english {
+  background: linear-gradient(135deg, #FDF8F3 0%, #D4C5E8 50%, #A8D5E5 100%);
+}
+
+.bg-gradient-success {
+  background: linear-gradient(135deg, #8FB996 0%, #A8D5E5 100%);
+}
+
+/* Button styles */
+.btn-primary {
+  @apply px-6 py-3 rounded-2xl font-bold text-white transition-all duration-300;
+  background: linear-gradient(135deg, var(--soft-coral) 0%, #E8958A 100%);
+  box-shadow: 0 4px 15px rgba(244, 166, 152, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(244, 166, 152, 0.5);
+}
+
+.btn-secondary {
+  @apply px-6 py-3 rounded-2xl font-bold text-white transition-all duration-300;
+  background: linear-gradient(135deg, var(--sage-green) 0%, #7AA882 100%);
+  box-shadow: 0 4px 15px rgba(143, 185, 150, 0.4);
+}
+
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(143, 185, 150, 0.5);
+}
+
+/* Progress bar */
+.progress-bar {
+  @apply h-4 rounded-full overflow-hidden;
+  background: rgba(0,0,0,0.1);
+}
+
+.progress-fill {
+  @apply h-full rounded-full transition-all duration-500;
+  background: linear-gradient(90deg, var(--sage-green) 0%, var(--sky-blue) 100%);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--soft-coral);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #E8958A;
+}
+
+/* Input styling */
+input, textarea {
+  @apply rounded-xl border-2 border-transparent px-4 py-3;
+  background: rgba(255,255,255,0.8);
+  transition: all 0.3s ease;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--soft-coral);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(244, 166, 152, 0.2);
+}
