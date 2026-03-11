@@ -1,34 +1,27 @@
-// MYTHIC ACADEMY - NEW CHARACTER & LOOT SYSTEM
-export interface Companion {
-  id: string;
-  name: string;
-  type: 'dragon' | 'phoenix' | 'unicorn' | 'griffin' | 'direwolf';
-  theme: 'fire' | 'rebirth' | 'magic' | 'strength' | 'loyalty';
-  stats: {
-    power: number;
-    wisdom: number;
-    speed: number;
-    defense: number;
-  };
-  image: string;
-  description: string;
-}
+// WIZARD ADVENTURE - SIMPLIFIED LOOT & CRAFTING SYSTEM
 
 export interface LootItem {
   id: string;
   name: string;
-  type: 'weapon' | 'armor' | 'accessory' | 'consumable' | 'treasure';
-  rarity: 'common' | 'rare' | 'epic' | 'legendary' | 'mythic';
-  stats?: {
-    power?: number;
-    wisdom?: number;
-    speed?: number;
-    defense?: number;
+  icon: string; // emoji (fallback)
+  image: {
+    spriteSheet: string;
+    x: number; // percentage position (0-100)
+    y: number; // percentage position (0-100)
+    width: number; // percentage width
+    height: number; // percentage height
   };
-  effect?: string;
-  image: string;
-  equipped: boolean;
-  equippedTo?: string; // companion id
+  rarity: 'common' | 'rare' | 'epic';
+  description: string;
+}
+
+export interface SuperItem {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  craftedAt: string;
+  recipe: string; // description of what loot was used
 }
 
 export interface Boss {
@@ -52,24 +45,32 @@ export interface WeeklyProgress {
   bossHealthRemaining: number;
 }
 
+// Module Progress
+export interface ModuleProgress {
+  moduleId: string;
+  completed: boolean;
+  questionsAnswered: number;
+  totalQuestions: number;
+  lootEarned?: string;
+  lastAttempted?: string;
+}
+
 // Game State Types
 export interface GameState {
   player: Player;
   progress: Progress;
   settings: Settings;
-  companions: Companion[];
-  inventory: LootItem[];
+  inventory: LootItem[]; // Regular loot items
+  superItems: SuperItem[]; // Crafted super items
   weekly: WeeklyProgress;
+  moduleProgress: Record<string, ModuleProgress>; // Track progress per module
 }
 
 export interface Player {
   name: string;
-  selectedCompanions: string[]; // ids of up to 3 companions
   level: number;
   xp: number;
   xpToNextLevel: number;
-  goldCoins: number;
-  sparkleStars: number;
   streak: Streak;
   badges: Badge[];
 }

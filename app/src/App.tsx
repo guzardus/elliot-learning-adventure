@@ -1,21 +1,19 @@
 import { useState, useEffect } from 'react';
 import { GameProvider, useGameState } from '@/hooks/useGameState';
-import { NameEntry, CompanionSelect, LootBox, BossBattle, Inventory } from '@/components/mythic';
-import { Dashboard } from '@/sections/Dashboard';
-import { MathLand } from '@/sections/MathLand';
-import { EnglishLand } from '@/sections/EnglishLand';
+import { NameEntry } from '@/components/mythic/NameEntry';
+import { AdventureHub } from '@/sections/AdventureHub';
 import { ActivityScreen } from '@/sections/ActivityScreen';
+import { BossBattle } from '@/components/mythic/BossBattle';
+import { LootBox } from '@/components/mythic/LootBox';
+import { Collection } from '@/components/mythic/Collection';
 import { Celebration } from '@/components/Celebration';
 import type { ActivityType } from '@/types';
 
 export type Screen = 
   | 'name-entry'
-  | 'companion-select'
-  | 'dashboard'
-  | 'math-land'
-  | 'english-land'
+  | 'adventure-hub'
   | 'activity'
-  | 'boss-battle';
+  | 'collection';
 
 function AppContent() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('name-entry');
@@ -24,28 +22,20 @@ function AppContent() {
   const [celebrationMessage, setCelebrationMessage] = useState('');
   const [showLootBox, setShowLootBox] = useState(false);
   const [showBossBattle, setShowBossBattle] = useState(false);
-  const [showInventory, setShowInventory] = useState(false);
+  const [showCollection, setShowCollection] = useState(false);
   const { state, updateStreak } = useGameState();
 
-  // Update streak on app load and check if new user
+  // Update streak on app load and check if returning user
   useEffect(() => {
     updateStreak();
-    // Check if user has already completed onboarding
-    if (state.player.name !== 'Explorer' && state.player.selectedCompanions.length > 0) {
-      setCurrentScreen('dashboard');
+    // Check if user has already entered their name
+    if (state.player.name !== 'Wizard' && state.player.name !== '') {
+      setCurrentScreen('adventure-hub');
     }
   }, []);
 
   const handleNameComplete = () => {
-    setCurrentScreen('companion-select');
-  };
-
-  const handleCompanionComplete = () => {
-    setCurrentScreen('dashboard');
-  };
-
-  const handleSelectLand = (land: 'math' | 'english') => {
-    setCurrentScreen(land === 'math' ? 'math-land' : 'english-land');
+    setCurrentScreen('adventure-hub');
   };
 
   const handleSelectActivity = (activity: ActivityType) => {
@@ -53,16 +43,18 @@ function AppContent() {
     setCurrentScreen('activity');
   };
 
-  const handleActivityComplete = (xpEarned: number) => {
+  const handleActivityComplete = (xpEarned: number, lootId?: string) => {
     if (xpEarned > 0) {
       setCelebrationMessage(`+${xpEarned} XP!`);
       setShowCelebration(true);
     }
 
     // Award loot box for completing activity
-    setTimeout(() => {
-      setShowLootBox(true);
-    }, 1500);
+    if (lootId) {
+      setTimeout(() => {
+        setShowLootBox(true);
+      }, 1500);
+    }
   };
 
   const handleLootClose = () => {
@@ -77,23 +69,18 @@ function AppContent() {
     setShowBossBattle(false);
   };
 
-  const handleOpenInventory = () => {
-    setShowInventory(true);
+  const handleOpenCollection = () => {
+    setShowCollection(true);
   };
 
-  const handleCloseInventory = () => {
-    setShowInventory(false);
+  const handleCloseCollection = () => {
+    setShowCollection(false);
   };
 
   const handleBack = () => {
     if (currentScreen === 'activity') {
-      if (selectedActivity?.startsWith('math')) {
-        setCurrentScreen('math-land');
-      } else {
-        setCurrentScreen('english-land');
-      }
-    } else if (currentScreen === 'math-land' || currentScreen === 'english-land') {
-      setCurrentScreen('dashboard');
+      setCurrentScreen('adventure-hub');
+      setSelectedActivity(null);
     }
   };
 
@@ -101,20 +88,14 @@ function AppContent() {
     switch (currentScreen) {
       case 'name-entry':
         return <NameEntry onComplete={handleNameComplete} />;
-      case 'companion-select':
-        return <CompanionSelect onComplete={handleCompanionComplete} />;
-      case 'dashboard':
+      case 'adventure-hub':
         return (
-          <Dashboard 
-            onSelectLand={handleSelectLand}
+          <AdventureHub 
+            onSelectActivity={handleSelectActivity}
             onBossBattle={handleBossBattle}
-            onViewInventory={handleOpenInventory}
+            onViewCollection={handleOpenCollection}
           />
         );
-      case 'math-land':
-        return <MathLand onSelectActivity={handleSelectActivity} onBack={handleBack} />;
-      case 'english-land':
-        return <EnglishLand onSelectActivity={handleSelectActivity} onBack={handleBack} />;
       case 'activity':
         return selectedActivity ? (
           <ActivityScreen 
@@ -151,12 +132,12 @@ function AppContent() {
       <BossBattle
         isOpen={showBossBattle}
         onClose={handleBossClose}
-        bossId="math-dragon"
+        bossId="weekly-boss"
       />
 
-      <Inventory
-        isOpen={showInventory}
-        onClose={handleCloseInventory}
+      <Collection
+        isOpen={showCollection}
+        onClose={handleCloseCollection}
       />
     </div>
   );

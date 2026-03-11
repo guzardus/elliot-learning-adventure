@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Check, X, Lightbulb, Volume2, EyeOff, Sparkles, Trophy, Sword } from 'lucide-react';
 import { useGameState } from '@/hooks/useGameState';
+import { generateRandomLoot } from '@/data/loot';
 import { 
   additionQuestions, 
   subtractionQuestions, 
@@ -10,12 +11,7 @@ import {
   wordProblemQuestions,
   measurementQuestions,
   geometryQuestions,
-  dataQuestions,
-  patternQuestions,
-  moneyQuestions,
-  fractionQuestions,
   getRandomQuestions,
-  getSurpriseMixQuestions,
   getSpellingWords,
   grammarQuestions,
   punctuationQuestions,
@@ -26,10 +22,12 @@ import type { ActivityType, MathQuestion, EnglishQuestion, SpellingWord } from '
 interface ActivityScreenProps {
   activityType: ActivityType;
   onBack: () => void;
-  onComplete: (xpEarned: number) => void;
+  onComplete: (xpEarned: number, lootId?: string) => void;
 }
 
 type QuestionType = MathQuestion | EnglishQuestion;
+
+const QUESTIONS_PER_MODULE = 10;
 
 export function ActivityScreen({ activityType, onBack, onComplete }: ActivityScreenProps) {
   const [questions, setQuestions] = useState<QuestionType[]>([]);
@@ -38,63 +36,47 @@ export function ActivityScreen({ activityType, onBack, onComplete }: ActivityScr
   const [showResult, setShowResult] = useState<'correct' | 'incorrect' | null>(null);
   const [showHint, setShowHint] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
-  const [coinsEarned, setCoinsEarned] = useState({ gold: 0, stars: 0 });
   const [streak, setStreak] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
-  const { addXp, addCoins, updateSkillProgress } = useGameState();
+  const { addXp, updateSkillProgress, updateModuleProgress, addLoot } = useGameState();
 
-  // Initialize questions based on activity type
+  // Initialize questions based on activity type - always 10 questions
   useEffect(() => {
     let loadedQuestions: QuestionType[] = [];
     
     switch (activityType) {
       case 'math-addition':
-        loadedQuestions = getRandomQuestions(additionQuestions, 10);
+        loadedQuestions = getRandomQuestions(additionQuestions, QUESTIONS_PER_MODULE);
         break;
       case 'math-subtraction':
-        loadedQuestions = getRandomQuestions(subtractionQuestions, 10);
+        loadedQuestions = getRandomQuestions(subtractionQuestions, QUESTIONS_PER_MODULE);
         break;
       case 'math-multiplication':
-        loadedQuestions = getRandomQuestions(multiplicationQuestions, 10);
+        loadedQuestions = getRandomQuestions(multiplicationQuestions, QUESTIONS_PER_MODULE);
         break;
       case 'math-division':
-        loadedQuestions = getRandomQuestions(divisionQuestions, 10);
+        loadedQuestions = getRandomQuestions(divisionQuestions, QUESTIONS_PER_MODULE);
         break;
       case 'math-wordProblems':
-        loadedQuestions = getRandomQuestions(wordProblemQuestions, 8);
+        loadedQuestions = getRandomQuestions(wordProblemQuestions, QUESTIONS_PER_MODULE);
         break;
       case 'math-measurement':
-        loadedQuestions = getRandomQuestions(measurementQuestions, 10);
+        loadedQuestions = getRandomQuestions(measurementQuestions, QUESTIONS_PER_MODULE);
         break;
       case 'math-geometry':
-        loadedQuestions = getRandomQuestions(geometryQuestions, 10);
-        break;
-      case 'math-data':
-        loadedQuestions = getRandomQuestions(dataQuestions, 8);
-        break;
-      case 'math-patterns':
-        loadedQuestions = getRandomQuestions(patternQuestions, 10);
-        break;
-      case 'math-money':
-        loadedQuestions = getRandomQuestions(moneyQuestions, 8);
-        break;
-      case 'math-fractions':
-        loadedQuestions = getRandomQuestions(fractionQuestions, 8);
-        break;
-      case 'surprise-mix':
-        loadedQuestions = getSurpriseMixQuestions(10);
+        loadedQuestions = getRandomQuestions(geometryQuestions, QUESTIONS_PER_MODULE);
         break;
       case 'english-grammar':
-        loadedQuestions = getRandomQuestions(grammarQuestions, 10);
+        loadedQuestions = getRandomQuestions(grammarQuestions, QUESTIONS_PER_MODULE);
         break;
       case 'english-punctuation':
-        loadedQuestions = getRandomQuestions(punctuationQuestions, 10);
+        loadedQuestions = getRandomQuestions(punctuationQuestions, QUESTIONS_PER_MODULE);
         break;
       case 'english-reading':
-        loadedQuestions = getRandomQuestions(readingPassages, 1);
+        loadedQuestions = getRandomQuestions(readingPassages, Math.min(5, QUESTIONS_PER_MODULE));
         break;
       default:
-        loadedQuestions = getRandomQuestions(additionQuestions, 5);
+        loadedQuestions = getRandomQuestions(additionQuestions, QUESTIONS_PER_MODULE);
     }
     
     setQuestions(loadedQuestions);
@@ -122,13 +104,6 @@ export function ActivityScreen({ activityType, onBack, onComplete }: ActivityScr
       
       setXpEarned(prev => prev + totalXp);
       
-      // Add coins based on activity type
-      if (activityType.startsWith('math')) {
-        setCoinsEarned(prev => ({ ...prev, gold: prev.gold + 5 }));
-      } else {
-        setCoinsEarned(prev => ({ ...prev, stars: prev.stars + 5 }));
-      }
-      
       // Update skill progress
       const skillMap: Record<string, string> = {
         'math-addition': 'math.addition',
@@ -136,8 +111,12 @@ export function ActivityScreen({ activityType, onBack, onComplete }: ActivityScr
         'math-multiplication': 'math.multiplication',
         'math-division': 'math.division',
         'math-wordProblems': 'math.wordProblems',
+        'math-measurement': 'math.measurement',
+        'math-geometry': 'math.geometry',
         'english-grammar': 'english.grammar',
-        'english-punctuation': 'english.punctuation'
+        'english-punctuation': 'english.punctuation',
+        'english-spelling': 'english.spelling',
+        'english-reading': 'english.reading'
       };
       
       const skill = skillMap[activityType];
@@ -158,11 +137,17 @@ export function ActivityScreen({ activityType, onBack, onComplete }: ActivityScr
       setShowResult(null);
       setShowHint(false);
     } else {
+      // Module complete - generate loot
+      const loot = generateRandomLoot();
+      addLoot(loot);
+      
+      // Update module progress
+      updateModuleProgress(activityType, QUESTIONS_PER_MODULE, true, loot.id);
+      
       setIsComplete(true);
-      addCoins(coinsEarned.gold, coinsEarned.stars);
-      onComplete(xpEarned);
+      onComplete(xpEarned, loot.id);
     }
-  }, [currentIndex, questions.length, coinsEarned, xpEarned, addCoins, onComplete]);
+  }, [currentIndex, questions.length, xpEarned, activityType, addLoot, updateModuleProgress, onComplete]);
 
   const handleRetry = useCallback(() => {
     setAnswer('');
@@ -172,7 +157,14 @@ export function ActivityScreen({ activityType, onBack, onComplete }: ActivityScr
 
   // Render different activity types
   if (activityType === 'english-spelling') {
-    return <SpellingActivity onBack={onBack} onComplete={onComplete} />;
+    return <SpellingActivity 
+      activityType={activityType}
+      onBack={onBack} 
+      onComplete={(xp, lootId) => {
+        updateModuleProgress(activityType, QUESTIONS_PER_MODULE, true, lootId || undefined);
+        onComplete(xp, lootId || undefined);
+      }} 
+    />;
   }
 
   if (questions.length === 0) {
@@ -190,7 +182,7 @@ export function ActivityScreen({ activityType, onBack, onComplete }: ActivityScr
           >
             ✨
           </motion.div>
-          <p className="text-white/60">Summoning your challenge...</p>
+          <p className="text-white/60">Preparing your adventure...</p>
         </div>
       </div>
     );
@@ -200,8 +192,8 @@ export function ActivityScreen({ activityType, onBack, onComplete }: ActivityScr
     return (
       <CompletionScreen 
         xpEarned={xpEarned}
-        coinsEarned={coinsEarned}
         onBack={onBack}
+        lootEarned={true}
       />
     );
   }
@@ -228,7 +220,7 @@ export function ActivityScreen({ activityType, onBack, onComplete }: ActivityScr
           <div className="flex-1 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/10">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-white/60">
-                Challenge {currentIndex + 1} of {questions.length}
+                Question {currentIndex + 1} of {QUESTIONS_PER_MODULE}
               </span>
               {streak > 0 && (
                 <span className="text-sm text-orange-400 font-medium flex items-center gap-1">
@@ -240,7 +232,7 @@ export function ActivityScreen({ activityType, onBack, onComplete }: ActivityScr
               <motion.div 
                 className="h-full bg-gradient-to-r from-purple-500 to-blue-500"
                 initial={{ width: 0 }}
-                animate={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
+                animate={{ width: `${((currentIndex + 1) / QUESTIONS_PER_MODULE) * 100}%` }}
               />
             </div>
           </div>
@@ -269,7 +261,7 @@ export function ActivityScreen({ activityType, onBack, onComplete }: ActivityScr
               {currentQuestion.type === 'wordProblem' && (
                 <div className="mt-4 p-4 bg-purple-500/20 rounded-xl border border-purple-500/30">
                   <p className="text-sm text-purple-200">
-                    <span className="font-bold">💡 Tip:</span> Read carefully and identify what operation you need!
+                    <span className="font-bold">💡 Tip:</span> Read carefully and identify the operation needed!
                   </p>
                 </div>
               )}
@@ -353,9 +345,9 @@ export function ActivityScreen({ activityType, onBack, onComplete }: ActivityScr
                         <X className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <p className="font-bold text-red-400">Not quite right</p>
+                        <p className="font-bold text-red-400">Not quite</p>
                         <p className="text-sm text-white/60">
-                          The answer was: {currentQuestion.correctAnswer}
+                          Answer: {currentQuestion.correctAnswer}
                         </p>
                       </div>
                     </>
@@ -385,7 +377,7 @@ export function ActivityScreen({ activityType, onBack, onComplete }: ActivityScr
                     whileTap={{ scale: answer.trim() ? 0.98 : 1 }}
                     className="flex-1 py-3 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all"
                   >
-                    Cast Answer
+                    Check Answer
                   </motion.button>
                 </>
               ) : (
@@ -406,7 +398,7 @@ export function ActivityScreen({ activityType, onBack, onComplete }: ActivityScr
                     whileTap={{ scale: 0.98 }}
                     className="flex-1 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold rounded-xl transition-all"
                   >
-                    {currentIndex < questions.length - 1 ? 'Next Challenge →' : 'Complete Quest! 🏆'}
+                    {currentIndex < questions.length - 1 ? 'Next Question →' : 'Complete Adventure! 🎁'}
                   </motion.button>
                 </>
               )}
@@ -418,18 +410,27 @@ export function ActivityScreen({ activityType, onBack, onComplete }: ActivityScr
   );
 }
 
-// Spelling Activity Component
-function SpellingActivity({ onBack, onComplete }: { onBack: () => void; onComplete: (xp: number) => void }) {
+// Spelling Activity Component - Modified for 10 questions
+function SpellingActivity({ 
+  activityType,
+  onBack, 
+  onComplete 
+}: { 
+  activityType: ActivityType;
+  onBack: () => void; 
+  onComplete: (xp: number, lootId?: string) => void;
+}) {
   const [words, setWords] = useState<SpellingWord[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [step, setStep] = useState<'look' | 'say' | 'cover' | 'write' | 'check'>('look');
   const [answer, setAnswer] = useState('');
   const [results, setResults] = useState<boolean[]>([]);
   const [isComplete, setIsComplete] = useState(false);
-  const { addXp, addCoins, updateSkillProgress } = useGameState();
+  const [xpEarned, setXpEarned] = useState(0);
+  const { addXp, updateSkillProgress, updateModuleProgress, addLoot } = useGameState();
 
   useEffect(() => {
-    setWords(getSpellingWords(10));
+    setWords(getSpellingWords(QUESTIONS_PER_MODULE));
   }, []);
 
   const currentWord = words[currentIndex];
@@ -446,6 +447,7 @@ function SpellingActivity({ onBack, onComplete }: { onBack: () => void; onComple
       if (isCorrect) {
         addXp(15, 'english');
         updateSkillProgress('english.spelling', true, 15);
+        setXpEarned(prev => prev + 15);
       }
     }
     
@@ -458,12 +460,12 @@ function SpellingActivity({ onBack, onComplete }: { onBack: () => void; onComple
         setStep('look');
         setAnswer('');
       } else {
+        // Module complete - generate loot
+        const loot = generateRandomLoot();
+        addLoot(loot);
+        updateModuleProgress(activityType, QUESTIONS_PER_MODULE, true, loot.id);
         setIsComplete(true);
-        const correctCount = results.filter(r => r).length;
-        const totalXp = correctCount * 15;
-        addXp(totalXp, 'english');
-        addCoins(0, correctCount * 5);
-        onComplete(totalXp);
+        onComplete(xpEarned, loot.id);
       }
     }
   };
@@ -475,7 +477,7 @@ function SpellingActivity({ onBack, onComplete }: { onBack: () => void; onComple
           background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
         }}
       >
-        <p className="text-white/60">Summoning words...</p>
+        <p className="text-white/60">Preparing spelling words...</p>
       </div>
     );
   }
@@ -485,8 +487,8 @@ function SpellingActivity({ onBack, onComplete }: { onBack: () => void; onComple
     return (
       <CompletionScreen 
         xpEarned={correctCount * 15}
-        coinsEarned={{ stars: correctCount * 5 }}
         onBack={onBack}
+        lootEarned={true}
       />
     );
   }
@@ -511,12 +513,12 @@ function SpellingActivity({ onBack, onComplete }: { onBack: () => void; onComple
           </motion.button>
           
           <div className="flex-1 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/10">
-            <span className="text-sm text-white/60">Rune {currentIndex + 1} of {words.length}</span>
+            <span className="text-sm text-white/60">Word {currentIndex + 1} of {QUESTIONS_PER_MODULE}</span>
             <div className="h-2 bg-white/10 rounded-full overflow-hidden mt-1">
               <motion.div 
                 className="h-full bg-gradient-to-r from-cyan-500 to-blue-500"
                 initial={{ width: 0 }}
-                animate={{ width: `${((currentIndex + 1) / words.length) * 100}%` }}
+                animate={{ width: `${((currentIndex + 1) / QUESTIONS_PER_MODULE) * 100}%` }}
               />
             </div>
           </div>
@@ -556,7 +558,7 @@ function SpellingActivity({ onBack, onComplete }: { onBack: () => void; onComple
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <p className="text-white/60 mb-6">Study this ancient rune carefully:</p>
+              <p className="text-white/60 mb-6">Look at this word:</p>
               <div className="text-5xl font-bold text-white mb-4" style={{ fontFamily: 'Georgia, serif' }}>
                 {currentWord.word}
               </div>
@@ -570,7 +572,7 @@ function SpellingActivity({ onBack, onComplete }: { onBack: () => void; onComple
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <p className="text-white/60 mb-6">Speak the rune aloud:</p>
+              <p className="text-white/60 mb-6">Say the word out loud:</p>
               <div className="text-4xl font-bold text-white mb-4" style={{ fontFamily: 'Georgia, serif' }}>
                 {currentWord.word}
               </div>
@@ -585,7 +587,7 @@ function SpellingActivity({ onBack, onComplete }: { onBack: () => void; onComple
                 className="px-6 py-3 bg-cyan-500/20 hover:bg-cyan-500/30 rounded-xl text-cyan-400 font-medium flex items-center gap-2 mx-auto border border-cyan-500/30"
               >
                 <Volume2 className="w-5 h-5" />
-                Hear the incantation
+                Hear it
               </motion.button>
             </motion.div>
           )}
@@ -595,11 +597,11 @@ function SpellingActivity({ onBack, onComplete }: { onBack: () => void; onComple
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <p className="text-white/60 mb-6">The rune is now hidden. Prepare to inscribe it!</p>
+              <p className="text-white/60 mb-6">Now hide it. Get ready to type it!</p>
               <div className="w-32 h-20 bg-purple-500/20 rounded-xl flex items-center justify-center mx-auto mb-4 border border-purple-500/30">
                 <EyeOff className="w-10 h-10 text-purple-400" />
               </div>
-              <p className="text-sm text-white/40">Remember: {currentWord.phonetic}</p>
+              <p className="text-sm text-white/40">Hint: {currentWord.phonetic}</p>
             </motion.div>
           )}
 
@@ -608,7 +610,7 @@ function SpellingActivity({ onBack, onComplete }: { onBack: () => void; onComple
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <p className="text-white/60 mb-6">Inscribe the rune:</p>
+              <p className="text-white/60 mb-6">Type the word:</p>
               <input
                 type="text"
                 value={answer}
@@ -638,10 +640,10 @@ function SpellingActivity({ onBack, onComplete }: { onBack: () => void; onComple
                   <div className="w-20 h-20 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
                     <X className="w-10 h-10 text-white" />
                   </div>
-                  <p className="text-xl font-bold text-red-400 mb-2">The rune was imperfect</p>
-                  <p className="text-white/60 mb-2">The correct rune was:</p>
+                  <p className="text-xl font-bold text-red-400 mb-2">Not quite</p>
+                  <p className="text-white/60 mb-2">Correct word:</p>
                   <p className="text-3xl font-bold text-white" style={{ fontFamily: 'Georgia, serif' }}>{currentWord.word}</p>
-                  <p className="text-sm text-white/40 mt-2">You inscribed: {answer}</p>
+                  <p className="text-sm text-white/40 mt-2">You typed: {answer}</p>
                 </div>
               )}
             </motion.div>
@@ -653,7 +655,7 @@ function SpellingActivity({ onBack, onComplete }: { onBack: () => void; onComple
             whileTap={{ scale: 0.98 }}
             className="mt-8 w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold rounded-xl transition-all"
           >
-            {step === 'check' ? 'Next Rune →' : 'Continue →'}
+            {step === 'check' ? (currentIndex < words.length - 1 ? 'Next Word →' : 'Complete Adventure! 🎁') : 'Continue →'}
           </motion.button>
         </div>
       </main>
@@ -663,12 +665,12 @@ function SpellingActivity({ onBack, onComplete }: { onBack: () => void; onComple
 
 function CompletionScreen({ 
   xpEarned, 
-  coinsEarned, 
-  onBack 
+  onBack,
+  lootEarned
 }: { 
   xpEarned: number; 
-  coinsEarned: { gold?: number; stars?: number }; 
   onBack: () => void;
+  lootEarned: boolean;
 }) {
   return (
     <div 
@@ -687,27 +689,31 @@ function CompletionScreen({
           animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.2, 1] }}
           transition={{ repeat: 2, duration: 0.5 }}
         >
-          🏆
+          {lootEarned ? '🎁' : '🏆'}
         </motion.div>
         
         <h2 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'Georgia, serif' }}>
-          Quest Complete!
+          Adventure Complete!
         </h2>
         
-        <p className="text-white/60 mb-8">Your knowledge grows stronger!</p>
+        <p className="text-white/60 mb-8">
+          {lootEarned ? 'You earned XP and found magical loot!' : 'Great job!'}
+        </p>
         
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-1 gap-4 mb-8">
           <div className="bg-purple-500/20 rounded-xl p-4 border border-purple-500/30">
             <Sparkles className="w-8 h-8 text-purple-400 mx-auto mb-2" />
             <p className="text-2xl font-bold text-white">+{xpEarned}</p>
             <p className="text-sm text-white/60">XP Earned</p>
           </div>
           
-          <div className="bg-yellow-500/20 rounded-xl p-4 border border-yellow-500/30">
-            <Trophy className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">+{coinsEarned.gold || coinsEarned.stars || 0}</p>
-            <p className="text-sm text-white/60">{coinsEarned.gold ? 'Gold' : 'Stars'}</p>
-          </div>
+          {lootEarned && (
+            <div className="bg-yellow-500/20 rounded-xl p-4 border border-yellow-500/30">
+              <Trophy className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
+              <p className="text-lg font-bold text-white">Loot Found!</p>
+              <p className="text-sm text-white/60">Check your loot box</p>
+            </div>
+          )}
         </div>
         
         <motion.button 
@@ -716,7 +722,7 @@ function CompletionScreen({
           whileTap={{ scale: 0.98 }}
           className="w-full py-3 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-bold rounded-xl transition-all"
         >
-          Return to Academy
+          Return to Adventure Hub
         </motion.button>
       </motion.div>
     </div>

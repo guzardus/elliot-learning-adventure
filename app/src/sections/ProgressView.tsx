@@ -54,7 +54,7 @@ export function ProgressView({ onBack }: ProgressViewProps) {
           >
             <ArrowLeft className="w-6 h-6 text-charcoal" />
           </motion.button>
-          <h1 className="text-3xl font-bold text-charcoal">Your Progress 📊</h1>
+          <h1 className="text-3xl font-bold text-charcoal">Your Progress</h1>
         </div>
       </header>
 
@@ -70,19 +70,19 @@ export function ProgressView({ onBack }: ProgressViewProps) {
           <StatCard 
             icon={<Target className="w-6 h-6 text-soft-coral" />}
             value={`${overallAccuracy}%`}
-            label="Accuracy"
+            label="Right answers"
             color="bg-soft-coral/20"
           />
           <StatCard 
             icon={<TrendingUp className="w-6 h-6 text-sage-green" />}
             value={progress.totalQuestionsAnswered}
-            label="Questions"
+            label="Questions done"
             color="bg-sage-green/20"
           />
           <StatCard 
             icon={<Clock className="w-6 h-6 text-sky-blue" />}
             value={`${Math.floor(progress.timeSpentMinutes / 60)}h ${progress.timeSpentMinutes % 60}m`}
-            label="Time Spent"
+            label="Time"
             color="bg-sky-blue/20"
           />
         </div>
@@ -92,7 +92,7 @@ export function ProgressView({ onBack }: ProgressViewProps) {
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-charcoal flex items-center gap-2">
               <Star className="w-5 h-5 text-warm-yellow" />
-              XP Progress
+              XP
             </h3>
             <span className="text-sm text-warm-gray">
               {player.xp} / {player.xpToNextLevel} XP
@@ -107,7 +107,7 @@ export function ProgressView({ onBack }: ProgressViewProps) {
             />
           </div>
           <p className="text-sm text-warm-gray mt-2 text-center">
-            {player.xpToNextLevel - player.xp} XP until Level {player.level + 1}
+            {player.xpToNextLevel - player.xp} XP to level {player.level + 1}
           </p>
         </div>
 
@@ -134,7 +134,7 @@ export function ProgressView({ onBack }: ProgressViewProps) {
                       <div className="flex justify-between mb-1">
                         <span className="text-sm font-medium text-charcoal">{skill.name}</span>
                         <span className="text-sm text-warm-gray">
-                          {skillData?.questionsAnswered || 0} answered
+                          {skillData?.questionsAnswered || 0} done
                         </span>
                       </div>
                       <div className="progress-bar h-2">
@@ -165,7 +165,7 @@ export function ProgressView({ onBack }: ProgressViewProps) {
         <div className="watercolour-card p-6">
           <h3 className="text-lg font-bold text-charcoal mb-4 flex items-center gap-2">
             <Trophy className="w-5 h-5 text-warm-yellow" />
-            Badges Earned
+            Badges
           </h3>
           {player.badges.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -183,7 +183,7 @@ export function ProgressView({ onBack }: ProgressViewProps) {
             </div>
           ) : (
             <p className="text-warm-gray text-center py-8">
-              Complete activities to earn badges! 🏆
+              Play games to earn badges! 🏆
             </p>
           )}
         </div>
@@ -194,14 +194,14 @@ export function ProgressView({ onBack }: ProgressViewProps) {
             <div className="flex items-center gap-4">
               <div className="text-4xl">🔥</div>
               <div>
-                <h3 className="text-lg font-bold text-charcoal">Learning Streak</h3>
+                <h3 className="text-lg font-bold text-charcoal">Days in a row</h3>
                 <p className="text-warm-gray">
-                  Current: {player.streak.current} days • Best: {player.streak.longest} days
+                  Now: {player.streak.current} • Best: {player.streak.longest}
                 </p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-sm text-warm-gray">Streak Freezes</p>
+              <p className="text-sm text-warm-gray">Freezes</p>
               <p className="text-xl font-bold text-sage-green">{player.streak.freezesRemaining}</p>
             </div>
           </div>

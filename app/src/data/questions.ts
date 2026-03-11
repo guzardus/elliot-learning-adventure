@@ -17,7 +17,7 @@ export const additionQuestions: MathQuestion[] = [
   { id: 'add-m4', type: 'addition', difficulty: 'medium', question: '3,456 + 5,789 = ?', correctAnswer: 9245, xpReward: 20 },
   { id: 'add-m5', type: 'addition', difficulty: 'medium', question: '8,234 + 4,567 = ?', correctAnswer: 12801, xpReward: 20 },
   
-  // Hard (like your son's homework)
+  // Hard
   { id: 'add-h1', type: 'addition', difficulty: 'hard', question: '458,329 + 294,294 = ?', correctAnswer: 752623, xpReward: 30, hint: 'Break it down: 400,000 + 200,000 = 600,000. Then add the rest!' },
   { id: 'add-h2', type: 'addition', difficulty: 'hard', question: '673,492 + 185,768 = ?', correctAnswer: 859260, xpReward: 30, hint: 'Add the thousands first: 673,000 + 185,000 = 858,000. Then add the rest!' },
   { id: 'add-h3', type: 'addition', difficulty: 'hard', question: '892,456 + 347,892 = ?', correctAnswer: 1240348, xpReward: 30, hint: 'Start with 892,456 + 300,000 = 1,192,456. Then add the remaining 47,892!' },
@@ -63,7 +63,7 @@ export const multiplicationQuestions: MathQuestion[] = [
   { id: 'mul-m4', type: 'multiplication', difficulty: 'medium', question: '56 × 7 = ?', correctAnswer: 392, xpReward: 20 },
   { id: 'mul-m5', type: 'multiplication', difficulty: 'medium', question: '89 × 5 = ?', correctAnswer: 445, xpReward: 20 },
   
-  // Hard (2-digit × 2-digit like your son's homework)
+  // Hard (2-digit × 2-digit)
   { id: 'mul-h1', type: 'multiplication', difficulty: 'hard', question: '37 × 26 = ?', correctAnswer: 962, xpReward: 30, hint: 'Try 37 × 20 = 740, then 37 × 6 = 222. Add them together!' },
   { id: 'mul-h2', type: 'multiplication', difficulty: 'hard', question: '48 × 35 = ?', correctAnswer: 1680, xpReward: 30, hint: '48 × 30 = 1,440. Then 48 × 5 = 240. Total: 1,680!' },
   { id: 'mul-h3', type: 'multiplication', difficulty: 'hard', question: '52 × 47 = ?', correctAnswer: 2444, xpReward: 30, hint: '50 × 47 = 2,350. Then add 2 × 47 = 94. Total: 2,444!' },
@@ -122,7 +122,7 @@ export const wordProblemQuestions: MathQuestion[] = [
     question: 'A library has 458,329 books. They receive a donation of 294,294 more books. How many books does the library have now?',
     correctAnswer: 752623, 
     xpReward: 35,
-    hint: 'This is just like your homework - add the two big numbers!'
+    hint: 'Add the two big numbers!'
   },
   
   // Subtraction word problems
@@ -151,7 +151,7 @@ export const wordProblemQuestions: MathQuestion[] = [
     question: 'A treasure chest had 473,029 gold coins. Pirates took 385,923 coins. How many coins remain?',
     correctAnswer: 87106, 
     xpReward: 35,
-    hint: 'Just like your homework - subtract the taken coins from the total!'
+    hint: 'Subtract the taken coins from the total!'
   },
   
   // Multiplication word problems
@@ -180,7 +180,7 @@ export const wordProblemQuestions: MathQuestion[] = [
     question: 'A school ordered 37 boxes of pencils. Each box contains 26 pencils. How many pencils did the school order?',
     correctAnswer: 962, 
     xpReward: 35,
-    hint: 'Just like your homework - multiply boxes by pencils per box!'
+    hint: 'Multiply boxes by pencils per box!'
   },
   
   // Division word problems

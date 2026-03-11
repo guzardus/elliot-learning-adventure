@@ -1,15 +1,11 @@
 import React, { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react';
-import type { GameState, Player, Badge, LootItem, WeeklyProgress } from '@/types';
-import { COMPANIONS } from '@/data/companions';
+import type { GameState, Player, Badge, LootItem, SuperItem, WeeklyProgress, ModuleProgress } from '@/types';
 
 const defaultPlayer: Player = {
-  name: 'Explorer',
-  selectedCompanions: [],
+  name: 'Wizard',
   level: 1,
   xp: 0,
   xpToNextLevel: 100,
-  goldCoins: 0,
-  sparkleStars: 0,
   streak: {
     current: 0,
     longest: 0,
@@ -60,6 +56,20 @@ const defaultWeekly: WeeklyProgress = {
   bossHealthRemaining: 100
 };
 
+const defaultModuleProgress: Record<string, ModuleProgress> = {
+  'math-addition': { moduleId: 'math-addition', completed: false, questionsAnswered: 0, totalQuestions: 10 },
+  'math-subtraction': { moduleId: 'math-subtraction', completed: false, questionsAnswered: 0, totalQuestions: 10 },
+  'math-multiplication': { moduleId: 'math-multiplication', completed: false, questionsAnswered: 0, totalQuestions: 10 },
+  'math-division': { moduleId: 'math-division', completed: false, questionsAnswered: 0, totalQuestions: 10 },
+  'math-wordProblems': { moduleId: 'math-wordProblems', completed: false, questionsAnswered: 0, totalQuestions: 10 },
+  'math-measurement': { moduleId: 'math-measurement', completed: false, questionsAnswered: 0, totalQuestions: 10 },
+  'math-geometry': { moduleId: 'math-geometry', completed: false, questionsAnswered: 0, totalQuestions: 10 },
+  'english-spelling': { moduleId: 'english-spelling', completed: false, questionsAnswered: 0, totalQuestions: 10 },
+  'english-grammar': { moduleId: 'english-grammar', completed: false, questionsAnswered: 0, totalQuestions: 10 },
+  'english-punctuation': { moduleId: 'english-punctuation', completed: false, questionsAnswered: 0, totalQuestions: 10 },
+  'english-reading': { moduleId: 'english-reading', completed: false, questionsAnswered: 0, totalQuestions: 10 },
+};
+
 const defaultState: GameState = {
   player: defaultPlayer,
   progress: defaultProgress as GameState['progress'],
@@ -69,23 +79,22 @@ const defaultState: GameState = {
     dailyGoal: 20,
     difficulty: 'medium'
   },
-  companions: COMPANIONS,
   inventory: [],
-  weekly: defaultWeekly
+  superItems: [],
+  weekly: defaultWeekly,
+  moduleProgress: defaultModuleProgress
 };
 
 type GameAction =
   | { type: 'SET_PLAYER'; payload: Player }
   | { type: 'ADD_XP'; payload: { amount: number; category: 'math' | 'english' | 'general' } }
-  | { type: 'ADD_COINS'; payload: { gold?: number; stars?: number } }
   | { type: 'UPDATE_STREAK' }
   | { type: 'ADD_BADGE'; payload: Badge }
   | { type: 'UPDATE_SKILL_PROGRESS'; payload: { skill: string; correct: boolean; xp: number } }
   | { type: 'SET_NAME'; payload: string }
-  | { type: 'SELECT_COMPANIONS'; payload: string[] }
   | { type: 'ADD_LOOT'; payload: LootItem }
-  | { type: 'EQUIP_ITEM'; payload: { itemId: string; companionId: string } }
-  | { type: 'UNEQUIP_ITEM'; payload: string }
+  | { type: 'CRAFT_SUPER_ITEM'; payload: SuperItem }
+  | { type: 'UPDATE_MODULE_PROGRESS'; payload: { moduleId: string; questionsAnswered: number; completed: boolean; lootId?: string } }
   | { type: 'UPDATE_BOSS_HEALTH'; payload: number }
   | { type: 'DEFEAT_BOSS' }
   | { type: 'RESET_WEEKLY' }
@@ -98,7 +107,7 @@ function calculateXpToNextLevel(level: number): number {
 function checkWeeklyReset(state: GameState): GameState {
   const currentWeekStart = getCurrentWeekStart();
   if (state.weekly.weekStartDate !== currentWeekStart) {
-    // New week started - reset weekly progress but keep inventory
+    // New week started - reset weekly progress but keep inventory and super items
     return {
       ...state,
       weekly: {
@@ -148,16 +157,6 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         }
       };
     }
-
-    case 'ADD_COINS':
-      return {
-        ...state,
-        player: {
-          ...state.player,
-          goldCoins: state.player.goldCoins + (action.payload.gold || 0),
-          sparkleStars: state.player.sparkleStars + (action.payload.stars || 0)
-        }
-      };
 
     case 'UPDATE_STREAK': {
       const today = new Date().toDateString();
@@ -279,15 +278,6 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         }
       };
 
-    case 'SELECT_COMPANIONS':
-      return {
-        ...state,
-        player: {
-          ...state.player,
-          selectedCompanions: action.payload.slice(0, 3) // Max 3 companions
-        }
-      };
-
     case 'ADD_LOOT':
       return {
         ...state,
@@ -298,26 +288,25 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         }
       };
 
-    case 'EQUIP_ITEM':
+    case 'CRAFT_SUPER_ITEM':
       return {
         ...state,
-        inventory: state.inventory.map(item =>
-          item.id === action.payload.itemId
-            ? { ...item, equipped: true, equippedTo: action.payload.companionId }
-            : item.equippedTo === action.payload.companionId && item.type === state.inventory.find(i => i.id === action.payload.itemId)?.type
-            ? { ...item, equipped: false, equippedTo: undefined }
-            : item
-        )
+        superItems: [...state.superItems, action.payload]
       };
 
-    case 'UNEQUIP_ITEM':
+    case 'UPDATE_MODULE_PROGRESS':
       return {
         ...state,
-        inventory: state.inventory.map(item =>
-          item.id === action.payload
-            ? { ...item, equipped: false, equippedTo: undefined }
-            : item
-        )
+        moduleProgress: {
+          ...state.moduleProgress,
+          [action.payload.moduleId]: {
+            ...state.moduleProgress[action.payload.moduleId],
+            questionsAnswered: action.payload.questionsAnswered,
+            completed: action.payload.completed,
+            ...(action.payload.lootId && { lootEarned: action.payload.lootId }),
+            lastAttempted: new Date().toISOString()
+          }
+        }
       };
 
     case 'UPDATE_BOSS_HEALTH':
@@ -363,27 +352,26 @@ interface GameContextType {
   state: GameState;
   dispatch: React.Dispatch<GameAction>;
   addXp: (amount: number, category: 'math' | 'english' | 'general') => void;
-  addCoins: (gold?: number, stars?: number) => void;
   updateStreak: () => void;
   addBadge: (badge: Badge) => void;
   updateSkillProgress: (skill: string, correct: boolean, xp: number) => void;
   setName: (name: string) => void;
-  selectCompanions: (companionIds: string[]) => void;
   addLoot: (item: LootItem) => void;
-  equipItem: (itemId: string, companionId: string) => void;
-  unequipItem: (itemId: string) => void;
+  craftSuperItem: (superItem: SuperItem, lootToConsume: string[]) => void;
+  updateModuleProgress: (moduleId: string, questionsAnswered: number, completed: boolean, lootId?: string) => void;
   damageBoss: (amount: number) => void;
   defeatBoss: () => void;
   getAccuracy: (skill?: string) => number;
   getLevelTitle: (level: number) => string;
-  getCompanionStats: (companionId: string) => { power: number; wisdom: number; speed: number; defense: number };
+  canCraftSuperItem: () => boolean;
+  getLootCount: () => number;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 const levelTitles = [
-  'Novice', 'Apprentice', 'Adept', 'Scholar', 
-  'Guardian', 'Champion', 'Hero', 'Legend', 'Master', 'Sage'
+  'Novice', 'Apprentice', 'Spellcaster', 'Enchanter',
+  'Sorcerer', 'Mage', 'Archmage', 'Wizard', 'Grand Wizard', 'Legend'
 ];
 
 export function GameProvider({ children }: { children: ReactNode }) {
@@ -391,7 +379,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   // Load from localStorage on mount
   useEffect(() => {
-    const saved = localStorage.getItem('mythicAcademyState');
+    const saved = localStorage.getItem('wizardAdventureState');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -404,15 +392,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   // Save to localStorage on changes
   useEffect(() => {
-    localStorage.setItem('mythicAcademyState', JSON.stringify(state));
+    localStorage.setItem('wizardAdventureState', JSON.stringify(state));
   }, [state]);
 
   const addXp = (amount: number, category: 'math' | 'english' | 'general') => {
     dispatch({ type: 'ADD_XP', payload: { amount, category } });
-  };
-
-  const addCoins = (gold?: number, stars?: number) => {
-    dispatch({ type: 'ADD_COINS', payload: { gold, stars } });
   };
 
   const updateStreak = () => {
@@ -431,20 +415,27 @@ export function GameProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'SET_NAME', payload: name });
   };
 
-  const selectCompanions = (companionIds: string[]) => {
-    dispatch({ type: 'SELECT_COMPANIONS', payload: companionIds });
-  };
-
   const addLoot = (item: LootItem) => {
     dispatch({ type: 'ADD_LOOT', payload: item });
   };
 
-  const equipItem = (itemId: string, companionId: string) => {
-    dispatch({ type: 'EQUIP_ITEM', payload: { itemId, companionId } });
+  const craftSuperItem = (superItem: SuperItem, lootToConsume: string[]) => {
+    // Remove consumed loot from inventory
+    const newInventory = [...state.inventory];
+    for (const lootId of lootToConsume) {
+      const index = newInventory.findIndex(item => item.id === lootId);
+      if (index > -1) {
+        newInventory.splice(index, 1);
+      }
+    }
+    
+    // Update state with new inventory and super item
+    dispatch({ type: 'LOAD_STATE', payload: { ...state, inventory: newInventory } });
+    dispatch({ type: 'CRAFT_SUPER_ITEM', payload: superItem });
   };
 
-  const unequipItem = (itemId: string) => {
-    dispatch({ type: 'UNEQUIP_ITEM', payload: itemId });
+  const updateModuleProgress = (moduleId: string, questionsAnswered: number, completed: boolean, lootId?: string) => {
+    dispatch({ type: 'UPDATE_MODULE_PROGRESS', payload: { moduleId, questionsAnswered, completed, lootId } });
   };
 
   const damageBoss = (amount: number) => {
@@ -480,29 +471,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
     return levelTitles[index];
   };
 
-  const getCompanionStats = (companionId: string) => {
-    const companion = state.companions.find(c => c.id === companionId);
-    if (!companion) return { power: 5, wisdom: 5, speed: 5, defense: 5 };
+  const canCraftSuperItem = (): boolean => {
+    return state.inventory.length >= 10;
+  };
 
-    // Calculate equipped item bonuses
-    const equippedItems = state.inventory.filter(item => item.equipped && item.equippedTo === companionId);
-    const bonuses = { power: 0, wisdom: 0, speed: 0, defense: 0 };
-    
-    equippedItems.forEach(item => {
-      if (item.stats) {
-        bonuses.power += item.stats.power || 0;
-        bonuses.wisdom += item.stats.wisdom || 0;
-        bonuses.speed += item.stats.speed || 0;
-        bonuses.defense += item.stats.defense || 0;
-      }
-    });
-
-    return {
-      power: companion.stats.power + bonuses.power,
-      wisdom: companion.stats.wisdom + bonuses.wisdom,
-      speed: companion.stats.speed + bonuses.speed,
-      defense: companion.stats.defense + bonuses.defense
-    };
+  const getLootCount = (): number => {
+    return state.inventory.length;
   };
 
   return (
@@ -510,20 +484,19 @@ export function GameProvider({ children }: { children: ReactNode }) {
       state,
       dispatch,
       addXp,
-      addCoins,
       updateStreak,
       addBadge,
       updateSkillProgress,
       setName,
-      selectCompanions,
       addLoot,
-      equipItem,
-      unequipItem,
+      craftSuperItem,
+      updateModuleProgress,
       damageBoss,
       defeatBoss,
       getAccuracy,
       getLevelTitle,
-      getCompanionStats
+      canCraftSuperItem,
+      getLootCount
     }}>
       {children}
     </GameContext.Provider>
