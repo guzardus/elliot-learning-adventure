@@ -1,0 +1,13 @@
+{
+  "generated": [
+    "bg-math-mountains",
+    "bg-reading-rainforest",
+    "bg-grammar-galaxy"
+  ],
+  "failed": [],
+  "total": 3,
+  "models_used": [
+    "google/gemini-2.5-flash-image",
+    "google/gemini-3-pro-image-preview"
+  ]
+}

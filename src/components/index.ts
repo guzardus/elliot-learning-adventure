@@ -1,0 +1,5 @@
+export { default as WButton } from './WButton'
+export { default as WCard } from './WCard'
+export { default as WProgress } from './WProgress'
+export { default as SVGFilters } from './SVGFilters'
+export * from './WIcon'

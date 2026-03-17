@@ -1,0 +1,22 @@
+{
+  "generated": [
+    "reading-ranger",
+    "story-vines",
+    "vocab-treasures",
+    "temple-inference",
+    "badge-bookworm",
+    "badge-wordcollector",
+    "badge-detective",
+    "vocab-definition",
+    "vocab-synonym",
+    "vocab-context",
+    "vocab-antonym"
+  ],
+  "failed": [],
+  "total": 11,
+  "models_used": [
+    "google/gemini-2.5-flash-image",
+    "google/gemini-3-pro-image-preview"
+  ],
+  "output_dir": "/Users/chen/Learning Project 1/prototype/elliot-adventure/public/images/reading-rainforest"
+}

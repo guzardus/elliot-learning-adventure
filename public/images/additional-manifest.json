@@ -1,0 +1,16 @@
+{
+  "generated": [
+    "world-math",
+    "world-rainforest",
+    "world-galaxy",
+    "math-peak-climbing",
+    "math-cave-fractions",
+    "math-bridge-builder"
+  ],
+  "failed": [],
+  "total": 6,
+  "models_used": [
+    "google/gemini-2.5-flash-image",
+    "google/gemini-3-pro-image-preview"
+  ]
+}
