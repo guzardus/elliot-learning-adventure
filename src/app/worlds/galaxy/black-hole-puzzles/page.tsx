@@ -291,7 +291,7 @@ export default function BlackHolePuzzles() {
                     >
                       <span className="font-bold mr-3">{String.fromCharCode(65 + index)}.</span>
                       {option}
-                      {showCorrect && <span className="float-right"><span className="text-green-600">>✓</#10003;</span></span>}
+                      {showCorrect && <span className="float-right"><span className="text-green-600">✓</span></span>}
                       {showWrong && <span className="float-right">✗</span>}
                     </motion.button>
                   )

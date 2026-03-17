@@ -1,6 +1,6 @@
 // MASSIVE CONTENT EXPANSION - Adding passages to reach 500 questions
 
-import { ReadingPassage, VocabularySet, InferencePuzzle } from './readingContent'
+import { ReadingPassage, VocabularySet, InferencePuzzle, grade3Passages, grade4Passages, vocabularySets, inferencePuzzles } from './readingContent'
 
 // ============================================
 // ADDITIONAL GRADE 3 PASSAGES (19 more to reach 20 total)

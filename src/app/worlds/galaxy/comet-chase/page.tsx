@@ -6,7 +6,7 @@ import Link from 'next/link'
 import WButton from '@/components/WButton'
 import WCard from '@/components/WCard'
 import { getRandomQuestions, GrammarQuestion } from '@/data/grammarQuestions'
-import { IconArrowLeft, IconStar, IconLightbulb, IconRocket } from '@/components/WIcon'
+import { IconArrowLeft, IconStar, IconLightbulb, IconRocket, IconFlame } from '@/components/WIcon'
 
 export default function CometChase() {
   const [gameState, setGameState] = useState<'intro' | 'playing' | 'answered' | 'finished'>('intro')
@@ -277,7 +277,7 @@ export default function CometChase() {
                     >
                       <span className="font-bold mr-3">{String.fromCharCode(65 + index)}.</span>
                       {option}
-                      {showCorrect && <span className="float-right"><span className="text-green-600">>✓</#10003;</span></span>}
+                      {showCorrect && <span className="float-right"><span className="text-green-600">✓</span></span>}
                       {showWrong && <span className="float-right">✗</span>}
                     </motion.button>
                   )

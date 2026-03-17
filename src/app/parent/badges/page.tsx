@@ -7,7 +7,7 @@ import { Badge, BADGE_DEFINITIONS, getBadgesByCategory } from '@/data/badges'
 import { BADGE_ICONS, DefaultBadgeIcon } from '@/components/BadgeIcons'
 import { format } from 'date-fns'
 
-type TabType = 'all' | 'math' | 'reading' | 'grammar' | 'streak' | 'general'
+type TabType = 'all' | 'unlocked' | 'locked'
 
 const TABS: { id: TabType; label: string }[] = [
   { id: 'all', label: 'All' },

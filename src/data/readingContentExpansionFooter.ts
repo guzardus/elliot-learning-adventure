@@ -4,6 +4,8 @@
 // CONTENT EXPANSION
 // ============================================
 
+import { allPassages, vocabularySets, inferencePuzzles } from './readingContent'
+
 // Note: Full expanded content is in readingContentExpansion.ts
 // Import and use completePassages for full 500+ question set
 

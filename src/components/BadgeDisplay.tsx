@@ -88,7 +88,7 @@ function BadgeCard({ badge, unlocked }: { badge: Badge; unlocked: boolean }) {
 }
 
 export function BadgeDisplay({ compact = false, className = '' }: BadgeDisplayProps) {
-  const [, actions] = useGamificationContext();
+  const actions = useGamificationContext();
   const [activeTab, setActiveTab] = useState<'all' | 'unlocked' | 'locked'>('all');
   
   const unlockedBadges = actions.getUnlockedBadges();
