@@ -256,7 +256,7 @@ export default function PeakClimbingPage() {
                       animate={{ scale: 1 }}
                       className="text-xl"
                     >
-                      \u{2713}
+                      ✓
                     </motion.div>
                   ) : isCurrent ? (
                     <motion.div
@@ -410,7 +410,7 @@ export default function PeakClimbingPage() {
                       className="bg-gold-accent/20 rounded-lg p-4 mb-4"
                     >
                       <p className="font-patrick text-ink-grey">
-                        \u{1F4A1} {currentQuestion.hint}
+                        * {currentQuestion.hint}
                       </p>
                     </motion.div>
                   )}
@@ -439,7 +439,7 @@ export default function PeakClimbingPage() {
                       animate={{ scale: 1 }}
                       className="text-green-600 font-caveat text-2xl"
                     >
-                      \u{1F389} Correct! Keep climbing!
+                      ! Correct! Keep climbing!
                     </motion.div>
                   )}
                   {feedback === 'incorrect' && (
@@ -448,7 +448,7 @@ export default function PeakClimbingPage() {
                       animate={{ opacity: 1 }}
                       className="text-red-500 font-caveat text-xl"
                     >
-                      \u{274C} Not quite! Try again!
+                      X Not quite! Try again!
                     </motion.div>
                   )}
                 </AnimatePresence>
