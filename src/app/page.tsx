@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import WButton from '@/components/WButton'
 import WCard from '@/components/WCard'
 import { 
@@ -30,6 +31,7 @@ const worlds = [
     bgClass: 'bg-world-math',
     worldKey: 'math' as const,
     worldImage: '/images/worlds/world-math.png',
+    href: '/worlds/math',
   },
   {
     id: 'rainforest' as World,
@@ -38,6 +40,7 @@ const worlds = [
     bgClass: 'bg-world-rainforest',
     worldKey: 'reading' as const,
     worldImage: '/images/worlds/world-rainforest.png',
+    href: '/worlds/reading',
   },
   {
     id: 'galaxy' as World,
@@ -46,6 +49,7 @@ const worlds = [
     bgClass: 'bg-world-galaxy',
     worldKey: 'grammar' as const,
     worldImage: '/images/worlds/world-galaxy.png',
+    href: '/worlds/galaxy',
   },
 ]
 
@@ -234,12 +238,14 @@ export default function Home() {
                       </div>
 
                       <div className="flex justify-center items-center gap-2">
-                        <WButton 
-                          variant={selectedWorld === world.id ? 'primary' : 'secondary'}
-                          size="sm"
-                        >
-                          {selectedWorld === world.id ? 'Selected' : 'Explore'}
-                        </WButton>
+                        <Link href={world.href}>
+                          <WButton 
+                            variant={selectedWorld === world.id ? 'primary' : 'secondary'}
+                            size="sm"
+                          >
+                            {selectedWorld === world.id ? 'Selected' : 'Explore'}
+                          </WButton>
+                        </Link>
                       </div>
                     </div>
                   </WCard>
