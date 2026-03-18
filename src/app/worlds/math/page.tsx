@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import Link from 'next/link'
 import WButton from '@/components/WButton'
 import WCard from '@/components/WCard'
 import WProgress from '@/components/WProgress'
@@ -12,11 +13,7 @@ import {
   IconHome,
   IconCheck
 } from '@/components/WIcon'
-import PeakClimbing from '@/components/PeakClimbing'
-import CaveOfFractions from '@/components/CaveOfFractions'
-import BridgeBuilder from '@/components/BridgeBuilder'
 
-type Activity = 'hub' | 'peak-climbing' | 'cave-fractions' | 'bridge-builder'
 type Difficulty = 'easy' | 'medium' | 'hard' | 'mixed'
 
 interface ActivityProgress {
@@ -27,12 +24,11 @@ interface ActivityProgress {
 }
 
 export default function MathMountains() {
-  const [currentActivity, setCurrentActivity] = useState<Activity>('hub')
   const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>('mixed')
-  const [showDifficultySelect, setShowDifficultySelect] = useState<Activity | null>(null)
+  const [showDifficultySelect, setShowDifficultySelect] = useState<string | null>(null)
   
   // Track progress for each activity
-  const [progress, setProgress] = useState<Record<'peak-climbing' | 'cave-fractions' | 'bridge-builder', ActivityProgress>>({
+  const [progress, setProgress] = useState<Record<string, ActivityProgress>>({
     'peak-climbing': { completed: 0, total: 10, bestScore: 0, totalXp: 0 },
     'cave-fractions': { completed: 0, total: 10, bestScore: 0, totalXp: 0 },
     'bridge-builder': { completed: 0, total: 8, bestScore: 0, totalXp: 0 },
@@ -40,94 +36,36 @@ export default function MathMountains() {
 
   const activities = [
     {
-      id: 'peak-climbing' as Activity,
+      id: 'peak-climbing',
       name: 'Peak Climbing',
       description: 'Climb mountain peaks by mastering 2-digit multiplication!',
       image: '/images/math/peak-climbing.png',
       color: 'from-blue-400 to-purple-500',
       difficulty: 'Grade 4-5',
       xpRange: '15-40 XP per question',
+      href: '/worlds/math/peak-climbing',
     },
     {
-      id: 'cave-fractions' as Activity,
+      id: 'cave-fractions',
       name: 'Cave of Fractions',
       description: 'Explore a glowing crystal cave while learning fractions and decimals!',
       image: '/images/math/cave-fractions.png',
       color: 'from-purple-600 to-indigo-800',
       difficulty: 'Grade 4-5',
       xpRange: '15-40 XP per question',
+      href: '/worlds/math/cave-of-fractions',
     },
     {
-      id: 'bridge-builder' as Activity,
+      id: 'bridge-builder',
       name: 'Bridge Builder',
       description: 'Build a bridge across the chasm with multi-step word problems!',
       image: '/images/math/bridge-builder.png',
       color: 'from-green-400 to-teal-500',
       difficulty: 'Grade 4-5',
       xpRange: '20-45 XP per question',
+      href: '/worlds/math/bridge-builder',
     },
   ]
-
-  const handleActivityComplete = (activity: 'peak-climbing' | 'cave-fractions' | 'bridge-builder', score: number, xpEarned: number) => {
-    setProgress(prev => ({
-      ...prev,
-      [activity]: {
-        ...(prev as any)[activity],
-        completed: (prev as any)[activity].completed + 1,
-        bestScore: Math.max((prev as any)[activity].bestScore, score),
-        totalXp: (prev as any)[activity].totalXp + xpEarned,
-      }
-    }))
-  }
-
-  const handleStartActivity = (activity: Activity) => {
-    setCurrentActivity(activity)
-    setShowDifficultySelect(null)
-  }
-
-  const handleExitActivity = () => {
-    setCurrentActivity('hub')
-  }
-
-  // Render activity components
-  if (currentActivity === 'peak-climbing') {
-    return (
-      <PeakClimbing 
-        onComplete={(score, xp) => {
-          handleActivityComplete('peak-climbing', score, xp)
-          handleExitActivity()
-        }}
-        onExit={handleExitActivity}
-        difficulty={selectedDifficulty}
-      />
-    )
-  }
-
-  if (currentActivity === 'cave-fractions') {
-    return (
-      <CaveOfFractions 
-        onComplete={(score, xp) => {
-          handleActivityComplete('cave-fractions', score, xp)
-          handleExitActivity()
-        }}
-        onExit={handleExitActivity}
-        difficulty={selectedDifficulty}
-      />
-    )
-  }
-
-  if (currentActivity === 'bridge-builder') {
-    return (
-      <BridgeBuilder 
-        onComplete={(score, xp) => {
-          handleActivityComplete('bridge-builder', score, xp)
-          handleExitActivity()
-        }}
-        onExit={handleExitActivity}
-        difficulty={selectedDifficulty}
-      />
-    )
-  }
 
   // Difficulty selector modal
   if (showDifficultySelect) {
@@ -190,9 +128,14 @@ export default function MathMountains() {
               <WButton variant="secondary" onClick={() => setShowDifficultySelect(null)}>
                 Back
               </WButton>
-              <WButton onClick={() => handleStartActivity(showDifficultySelect)}>
-                Start Adventure!
-              </WButton>
+              {(() => {
+                const activity = activities.find(a => a.id === showDifficultySelect)
+                return activity ? (
+                  <Link href={`${activity.href}?difficulty=${selectedDifficulty}`}>
+                    <WButton>Start Adventure!</WButton>
+                  </Link>
+                ) : null
+              })()}
             </div>
           </WCard>
         </div>
